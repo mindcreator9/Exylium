@@ -1,0 +1,13 @@
+How to use the Exylium system?
+
+WITH THE .exe
+
+1. Download the .exe file and save it where you want.
+2. You run it and that's it
+
+(It may be detected as a Trojan by pyinstaller but it does not have any virus or Trojan)
+
+With the python code.
+
+1. Copy the python code and then run it
+(Remember to download the libraries required by the code.)
