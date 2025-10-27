@@ -6,7 +6,6 @@ from tqdm import tqdm
 from colorama import init, Fore
 
 def print_exylium_title():
-    # Texto estático con diferentes colores
     title_lines = [
         Fore.RED + "▄▄▄▄▄▄▄▄▄▄▄  ▄       ▄  ▄         ▄  ▄            ▄▄▄▄▄▄▄▄▄▄▄  ▄         ▄  ▄▄       ▄▄",
         Fore.GREEN + "▐░░░░░░░░░░░▌▐░▌     ▐░▌▐░▌       ▐░▌▐░▌          ▐░░░░░░░░░░░▌▐░▌       ▐░▌▐░░▌     ▐░░▌",
@@ -21,14 +20,11 @@ def print_exylium_title():
         Fore.GREEN + " ▀▀▀▀▀▀▀▀▀▀▀  ▀       ▀       ▀       ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀  ▀         ▀ "
     ]
 
-    # Obtener el tamaño actual de la consola
     columns, rows = shutil.get_terminal_size()
 
-    # Calcular los espacios necesarios para centrar el texto verticalmente
     vertical_padding = (rows - len(title_lines)) // 2
     print("\n" * vertical_padding)
 
-    # Imprimir cada línea del título centrada horizontalmente
     for line in title_lines:
         padding = ' ' * ((columns - len(line)) // 2)
         print(padding + line)
@@ -36,7 +32,6 @@ def print_exylium_title():
 def cargar_codigo_esp8266():
     while True:
         try:
-            # Pedir el directorio del archivo .bin
             directorio = input("Por favor, especifica el directorio del archivo .bin que deseas cargar a los ESP8266 (o 'q' para salir): ").strip()
             if directorio.lower() == 'q':
                 break
@@ -44,31 +39,26 @@ def cargar_codigo_esp8266():
                 print(Fore.RED + "El archivo especificado no existe.")
                 continue
 
-            # Buscar los puertos seriales disponibles
             puertos = list(serial.tools.list_ports.comports())
             if not puertos:
                 print(Fore.RED + "No se encontraron puertos seriales disponibles.")
                 continue
 
-            # Iterar sobre los puertos seriales encontrados
             for puerto in puertos:
                 try:
                     print(Fore.GREEN + f"Cargando código en el puerto {puerto.device}...")
 
-                    # Comando para cargar el código usando esptool.py
                     comando = f"python -m esptool --port {puerto.device} write_flash 0x00000 {directorio}"
 
-                    # Obtener el tamaño del archivo .bin para la barra de carga
                     tamano_archivo = os.path.getsize(directorio)
 
-                    # Usar tqdm para mostrar una barra de progreso
                     with tqdm(total=tamano_archivo, unit='B', unit_scale=True, desc=f'Cargando en {puerto.device}', position=0, leave=True, ncols=100) as progress:
-                        # Iniciar el proceso para cargar el código
+                    
                         proceso = subprocess.Popen(comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1, universal_newlines=True)
 
-                        # Leer la salida del proceso línea por línea para actualizar la barra de progreso
+                       
                         for line in proceso.stdout:
-                            # Buscar el progreso en la línea
+
                             if "Writing at " in line:
                                 percent_index = line.find("(")
                                 if percent_index != -1:
@@ -79,13 +69,13 @@ def cargar_codigo_esp8266():
                                     except ValueError:
                                         pass
 
-                        # Capturar cualquier error durante el proceso
+
                         stdout, stderr = proceso.communicate()
                         if proceso.returncode != 0:
                             print(Fore.RED + f"Error al cargar el código en {puerto.device}. Detalles:")
                             print(stderr.strip())
                         else:
-                            progress.update(tamano_archivo - progress.n)  # Completar la barra de progreso si no se actualizó al 100%
+                            progress.update(tamano_archivo - progress.n)
                             print(f"\n{Fore.GREEN}Carga completada en {puerto.device}.")
 
                 except Exception as e:
